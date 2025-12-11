@@ -136,7 +136,6 @@ The GNN-enhanced version uses the embeddings in the objective.
 
 Install dependencies:
 
-```bash
 pip install numpy pandas jupyter
 
 ▶️ Running Experiments
@@ -150,7 +149,7 @@ run SHLO/Hill-Climbing (baseline + GNN versions),
 
 generate GNN_EXPERIMENT_RESULTS.md.
 
-6. Using the Intrinsic-Value & Financial-Health Notebooks
+### 6. Using the Intrinsic-Value & Financial-Health Notebooks
 
 Two notebooks included:
 
@@ -170,7 +169,7 @@ To run them:
 jupyter notebook
 Then open each notebook and run all cells.
 
-7. Configuration
+### 7. Configuration
 All tunable settings are inside main() in the experiment script:
 PORTFOLIO_SIZE = 10
 LARGE_CAP_COUNT = 5
@@ -195,7 +194,7 @@ RANDOM_SEED = 42
 
 Change these to experiment with different configurations.
 
-8. Credits & Attribution
+### 8. Credits & Attribution
 
 This project reuses and extends work from:
 
