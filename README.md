@@ -1,55 +1,223 @@
-# GNN-Enhanced Stock Portfolio Optimization
+# 📘 GL2-Robust: Graph-Based Portfolio Optimization with Human-Inspired Search
 
-Lean, results-focused version of the project that adds a minimal Graph Neural Network (GNN) on top of the parent paper’s SHLO and Hill Climbing algorithms. The codebase is trimmed to only what is needed to reproduce the new GNN results and graphs.
+ **Research prototype for stock portfolio optimization using Graph Neural Networks (GNNs) + human-inspired search (SHLO + Hill Climbing).**  
 
-## What’s New vs. Parent Paper
-- Added a lightweight NumPy-based GNN to learn stock-to-stock relationships (category + feature similarity).
-- Plugged GNN-enhanced scores into both SHLO and Hill Climbing objective functions.
-- Produced side-by-side baselines vs. GNN runs and publication-ready visualizations.
-- Removed legacy notebooks, split utilities, and unused datasets to keep the repo focused on the new results.
+## 1. Overview
 
-## Repo Contents
-- `gnn_portfolio_optimization.py` — runs four experiments: baseline SHLO, GNN-SHLO, baseline HC, GNN-HC.
-- `Final_Input_dataset_for_DSS.csv` — stock universe with fundamentals, intrinsic values, and fitness metrics.
-- `GNN_EXPERIMENT_RESULTS.md` — detailed tables, portfolios, and conclusions from the GNN runs.
-- `generate_graphs.py` — regenerates comparison plots (non-GUI backend).
-- `new_results/` — generated PNG charts.
-- `LICENSE`, `README.md`.
+This project implements **GL2-Robust**, a hybrid portfolio optimization framework that combines:
 
-## Key Experiment Settings
-- Portfolio size: 10 (Large 5, Mid 2, Small 3)
-- Budget: $10,000; per-stock bounds: 5%–20%
-- Objective weights: fitness 0.50, percent-change-to-intrinsic 0.20, revenue growth 0.25, budget use 0.05
-- GNN: 2 layers (16 hidden, 8 output), symmetric-normalized adjacency, cosine + category edges, seed 42
-- Enhanced score = 0.8 × original metric + 0.2 × GNN embedding (per metric)
+- **Graph Neural Networks (GNNs)** to learn structural relationships between stocks,  
+- **Simple Human Learning Optimization (SHLO)** for global exploration, and  
+- **Hill Climbing** for local refinement.
 
-## Results (from latest run)
-- SHLO: 5.5655 → **6.3696** with GNN (+14.45%)
-- Hill Climbing: 7.0068 → **7.5926** with GNN (+8.36%)
-- Budget use: 57–69% (baselines) vs. 63–65% (GNN variants)
-- Best performer: GNN-HC (objective 7.5926)
-See `GNN_EXPERIMENT_RESULTS.md` for full tables and portfolios.
+The GNN captures market topology (similarities across sectors, categories, and fundamentals), while SHLO/Hill-Climbing handle the search over feasible portfolios under budget and category constraints.
 
-## How to Run
-Install deps (Python 3.9+):
-```
-python3 -m venv .venv
-source .venv/bin/activate
-pip install numpy pandas matplotlib
-```
+The system outputs:
 
-Run the four experiments (prints results to console):
-```
-python gnn_portfolio_optimization.py
-```
+- Optimized portfolios for four algorithm variants,  
+- Objective values, budget utilization, and timing,  
+- An auto-generated experiment report: **`GNN_EXPERIMENT_RESULTS.md`**.
 
-Regenerate charts:
-```
-python generate_graphs.py
-```
-Outputs are saved under `new_results/`.
 
-## Change Log (cleaned branch)
-- Added: minimal GNN feature builder + message passing; enhanced objective integration for SHLO/HC.
-- Added: `generate_graphs.py` and `new_results/` plots; `GNN_EXPERIMENT_RESULTS.md`.
-- Removed: legacy notebooks, dataset split utilities, old intrinsic/fitness CSVs, archives, and unused docs to keep only what supports the new GNN results.
+## 2. What This Project Does
+
+### 🔍 **Innovation**
+
+We introduce a lightweight GNN layer that models relationships between stocks using:
+
+1. **Category similarity**  
+2. **Feature similarity** (fitness, intrinsic value gap, growth, etc.)  
+3. **Message passing** (graph convolution)
+
+The GNN produces **enhanced embeddings**, which are blended with financial features and directly influence portfolio selection.
+
+### 🧪 **Experiment Setup**
+
+- **Portfolio size:** 10 (can be adjusted)  
+- **Category split:** e.g., 5 large-cap, 2 mid-cap, 3 small-cap  
+- **Investment budget:** \$10,000  
+- **Per-stock budget bounds:** 5%–20%  
+- **Objective function:**
+
+\[
+J(w) = \alpha_1 \cdot \text{Health} + \alpha_2 \cdot \text{Value} + \alpha_3 \cdot \text{Growth} + \alpha_4 \cdot \text{BudgetUtilization}
+\]
+
+Default weights:
+
+| Component                     | Weight |
+|------------------------------|--------|
+| Fitness Score                | 0.50   |
+| Intrinsic-Value Deviation    | 0.20   |
+| Revenue Growth               | 0.25   |
+| Budget Utilization           | 0.05   |
+
+Four algorithm variants are compared:
+
+1. **Baseline SHLO**  
+2. **GNN-SHLO**  
+3. **Baseline Hill Climbing**  
+4. **GNN-Hill Climbing**  
+
+## 3. Method Summary
+
+### 🧱 **Graph Construction & GNN**
+
+**Node features include:**
+
+- normalized fitness score  
+- normalized percent difference from intrinsic value  
+- normalized revenue growth  
+- normalized stock price  
+- category one-hot encoding  
+
+**Edges connect stocks that:**
+
+- belong to the same category, **or**
+- have cosine similarity > 0.3
+
+**GNN Architecture:**
+Input (8 features)
+→ Graph Layer (16 units, ReLU)
+→ Graph Layer (8 units)
+→ Embeddings
+
+
+**Enhanced scoring formula:**
+enhanced = 0.8 × original_score + 0.2 × embedding_score
+
+Used for fitness, value deviation, and revenue growth.
+
+
+### 🧠 SHLO (Simple Human Learning Optimization)
+
+SHLO maintains a **population of portfolios** and updates them using:
+
+- **Random learning** — exploration  
+- **Individual learning (IKD)** — based on historical best  
+- **Social learning (SKD)** — imitate global best  
+
+Only portfolios satisfying:
+
+- category constraints,  
+- per-stock budget limits,  
+- total budget ≤ \$10,000  
+
+are accepted.
+
+
+### 🧗 Hill Climbing
+
+- Starts with a valid portfolio  
+- Swaps stocks with others of the same category  
+- Accepts only improvements  
+
+The GNN-enhanced version uses the embeddings in the objective.
+
+
+## 4. Repository Structure
+├── data/
+│ └── Final_Input_dataset_for_DSS.csv
+├── notebooks/
+│ ├── Intrinsic_Value_Calculation.ipynb
+│ └── US_Stock_Financial_Health_Analysis.ipynb
+├── src/
+│ └── gnn_portfolio_experiments.py
+├── GNN_EXPERIMENT_RESULTS.md
+├── README.md
+└── LICENSE
+
+## 5. Installation & Setup
+
+### 📦 Requirements
+
+- Python **3.9+**
+- Recommended: virtual environment
+
+Install dependencies:
+
+```bash
+pip install numpy pandas jupyter
+
+▶️ Running Experiments
+cd src
+python gnn_portfolio_experiments.py
+This will:
+
+load the dataset,
+
+run SHLO/Hill-Climbing (baseline + GNN versions),
+
+generate GNN_EXPERIMENT_RESULTS.md.
+
+6. Using the Intrinsic-Value & Financial-Health Notebooks
+
+Two notebooks included:
+
+Intrinsic_Value_Calculation.ipynb
+
+US_Stock_Financial_Health_Analysis.ipynb
+
+These compute the financial features used by the optimizer:
+
+intrinsic value estimates
+
+financial-health scores
+
+normalized growth metrics
+
+To run them:
+jupyter notebook
+Then open each notebook and run all cells.
+
+7. Configuration
+All tunable settings are inside main() in the experiment script:
+PORTFOLIO_SIZE = 10
+LARGE_CAP_COUNT = 5
+MID_CAP_COUNT = 2
+TOTAL_BUDGET = 10000
+
+UPPER_BUDGET_LIMIT = 0.20
+LOWER_BUDGET_LIMIT = 0.05
+
+WEIGHT_FITNESS = 0.5
+WEIGHT_PERCENT_CHANGE = 0.2
+WEIGHT_REV_GROWTH = 0.25
+WEIGHT_NORMALIZED_BUDGET = 0.05
+
+SHLO_EPOCHS = 100
+SHLO_POP_SIZE = 50
+HC_ITERATIONS = 1000
+
+Random seed:
+
+RANDOM_SEED = 42
+
+Change these to experiment with different configurations.
+
+8. Credits & Attribution
+
+This project reuses and extends work from:
+
+Suyash S. Satpute — Stock-Portfolio-Optimization-Project
+🔗 https://github.com/SuyashSatpute/Stock-Portfolio-Optimization-Project
+
+Adapted files:
+
+Intrinsic_Value_Calculation.ipynb
+
+US_Stock_Financial_Health_Analysis.ipynb
+
+Licensed under MIT License, which requires proper attribution.
+We extend the project with:
+
+a new GNN architecture,
+
+GL2-Robust optimization design,
+
+full SHLO + GNN + Hill Climbing integration,
+
+experimental reports.
+
+
+
