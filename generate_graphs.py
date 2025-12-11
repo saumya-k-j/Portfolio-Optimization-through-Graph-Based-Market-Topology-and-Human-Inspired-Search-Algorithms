@@ -1,15 +1,4 @@
 #!/usr/bin/env python3
-"""
-Generate comparison graphs for GNN-Enhanced Portfolio Optimization Results
-
-This script creates visualizations comparing:
-1. Baseline algorithms vs GNN-enhanced algorithms
-2. SHLO vs Hill Climbing performance
-3. Budget utilization comparison
-4. Portfolio composition analysis
-
-Output: Graphs saved to new_results/ folder
-"""
 
 import matplotlib
 matplotlib.use('Agg')  # Use non-GUI backend
@@ -32,9 +21,7 @@ plt.rcParams['axes.labelsize'] = 12
 plt.rcParams['legend.fontsize'] = 11
 plt.rcParams['figure.dpi'] = 150
 
-# ============================================================================
-# RESULTS DATA (from experiments)
-# ============================================================================
+#Results
 
 # Current GNN experiment results
 results = {
@@ -94,9 +81,9 @@ COLORS = {
     'original': '#95a5a6'       # Gray
 }
 
-# ============================================================================
-# GRAPH 1: Objective Value Comparison (Bar Chart)
-# ============================================================================
+
+# Graph 1: Objective Value Comparison (Bar Chart)
+
 
 def plot_objective_comparison():
     """Bar chart comparing objective values across all algorithms."""
@@ -154,9 +141,9 @@ def plot_objective_comparison():
     print(f"Saved: {OUTPUT_DIR}/1_objective_comparison.png")
 
 
-# ============================================================================
-# GRAPH 2: Improvement Percentage (Horizontal Bar)
-# ============================================================================
+
+# Graph 2: Improvement Percentage (Horizontal Bar)
+
 
 def plot_improvement_percentage():
     """Horizontal bar chart showing improvement percentages."""
@@ -191,9 +178,8 @@ def plot_improvement_percentage():
     print(f"Saved: {OUTPUT_DIR}/2_improvement_percentage.png")
 
 
-# ============================================================================
-# GRAPH 3: Budget Utilization Comparison
-# ============================================================================
+# Graph 3: Budget Utilization Comparison
+
 
 def plot_budget_utilization():
     """Grouped bar chart comparing budget utilization."""
@@ -236,9 +222,9 @@ def plot_budget_utilization():
     print(f"Saved: {OUTPUT_DIR}/3_budget_utilization.png")
 
 
-# ============================================================================
-# GRAPH 4: Execution Time Comparison
-# ============================================================================
+
+# Graph 4: Execution Time Comparison
+
 
 def plot_execution_time():
     """Bar chart comparing execution times."""
@@ -280,9 +266,9 @@ def plot_execution_time():
     print(f"Saved: {OUTPUT_DIR}/4_execution_time.png")
 
 
-# ============================================================================
-# GRAPH 5: Before vs After GNN (Side-by-side comparison)
-# ============================================================================
+
+# Graph 5: Before vs After GNN (Side-by-side comparison)
+
 
 def plot_before_after():
     """Side-by-side comparison showing before/after GNN enhancement."""
@@ -334,9 +320,9 @@ def plot_before_after():
     print(f"Saved: {OUTPUT_DIR}/5_before_after_comparison.png")
 
 
-# ============================================================================
-# GRAPH 6: Radar Chart - Multi-metric Comparison
-# ============================================================================
+
+# Graph 6: Radar Chart - Multi-metric Comparison
+
 
 def plot_radar_chart():
     """Radar chart comparing multiple metrics across algorithms."""
@@ -394,9 +380,8 @@ def plot_radar_chart():
     print(f"Saved: {OUTPUT_DIR}/6_radar_comparison.png")
 
 
-# ============================================================================
-# GRAPH 7: Algorithm Performance Summary
-# ============================================================================
+# Graph 7: Algorithm Performance Summary
+
 
 def plot_summary_dashboard():
     """Create a summary dashboard with multiple subplots."""
@@ -459,17 +444,10 @@ def plot_summary_dashboard():
     ax6.axis('off')
     findings = """
     KEY FINDINGS
-    ════════════════════════════
     
     ✓ GNN-SHLO improved by 14.45%
     
     ✓ GNN-HC improved by 8.36%
-    
-    ✓ Best algorithm: GNN-HC
-      (Objective: 7.5926)
-    
-    ✓ GNN adds minimal overhead
-      (~0.03s additional time)
     
     ✓ Graph-based learning
       captures stock relationships
@@ -486,9 +464,9 @@ def plot_summary_dashboard():
     print(f"Saved: {OUTPUT_DIR}/7_summary_dashboard.png")
 
 
-# ============================================================================
-# GRAPH 8: Comparison with Original Paper Results
-# ============================================================================
+
+# Graph 8: Comparison with Original Paper Results
+
 
 def plot_original_comparison():
     """Compare current results with original notebook results."""
@@ -556,10 +534,6 @@ def plot_original_comparison():
     plt.close()
     print(f"Saved: {OUTPUT_DIR}/8_original_comparison.png")
 
-
-# ============================================================================
-# MAIN EXECUTION
-# ============================================================================
 
 def main():
     """Generate all graphs."""
