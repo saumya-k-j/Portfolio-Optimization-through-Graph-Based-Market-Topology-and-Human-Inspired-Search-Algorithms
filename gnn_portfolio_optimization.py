@@ -31,9 +31,7 @@ np.random.seed(RANDOM_SEED)
 random.seed(RANDOM_SEED)
 
 
-# ============================================================================
-# SIMPLE GRAPH NEURAL NETWORK IMPLEMENTATION
-# ============================================================================
+#Graph GNN implementation
 
 class SimpleGNN:
     """
@@ -215,9 +213,7 @@ def prepare_gnn_features(stocks_df):
     return all_features, categories, features
 
 
-# ============================================================================
-# GNN-ENHANCED SHLO ALGORITHM
-# ============================================================================
+#GNN- With SHLO algrotihm
 
 class BudgetAllocation:
     def __init__(self, total_budget, upper_budget_limit, lower_budget_limit):
@@ -459,9 +455,7 @@ def run_gnn_enhanced_shlo(stocks_df, portfolio_size, large_cap_count, mid_cap_co
     return portfolio, best_node.fitness, total_budget_used, time_taken, embeddings
 
 
-# ============================================================================
-# GNN-ENHANCED HILL CLIMBING ALGORITHM
-# ============================================================================
+#GNN- Enhanced with Hill Climbing Algorithm
 
 def run_gnn_enhanced_hill_climbing(stocks_df, portfolio_size, large_cap_count, mid_cap_count,
                                     total_budget, upper_budget_limit, lower_budget_limit,
@@ -652,9 +646,7 @@ def run_gnn_enhanced_hill_climbing(stocks_df, portfolio_size, large_cap_count, m
     return portfolio, best_obj, best_budget, time_taken, embeddings
 
 
-# ============================================================================
-# BASELINE ALGORITHMS (WITHOUT GNN)
-# ============================================================================
+#Baseline Algorithms for Comparison
 
 def run_baseline_shlo(stocks_df, portfolio_size, large_cap_count, mid_cap_count,
                       total_budget, upper_budget_limit, lower_budget_limit,
@@ -964,9 +956,7 @@ def run_baseline_hill_climbing(stocks_df, portfolio_size, large_cap_count, mid_c
     return portfolio, best_obj, best_budget, time_taken
 
 
-# ============================================================================
-# MAIN EXECUTION
-# ============================================================================
+#Main Running
 
 def main():
     """Run all experiments and compare results."""
@@ -1067,183 +1057,6 @@ def generate_results_report(results, portfolio_size, total_budget, large_cap, mi
     """Generate markdown report with results comparison."""
     
     report = f"""# GNN-Enhanced Stock Portfolio Optimization Results
-
-## Experiment Overview
-
-This document presents the results of integrating Graph Neural Networks (GNN) with 
-traditional optimization algorithms (SHLO and Hill Climbing) for stock portfolio optimization.
-
-### Innovation
-
-**Novel Contribution**: We introduce a simple Graph Neural Network layer that models 
-relationships between stocks based on:
-1. **Category similarity** - Stocks in the same market cap category are connected
-2. **Feature similarity** - Stocks with similar normalized metrics are connected
-3. **Message passing** - Information is aggregated from neighboring stocks
-
-The GNN produces enhanced feature representations that capture not just individual 
-stock characteristics but also their relationships within the stock universe.
-
-### Experiment Parameters
-
-| Parameter | Value |
-|-----------|-------|
-| Portfolio Size | {portfolio_size} stocks |
-| Large-cap Stocks | {large_cap} |
-| Mid-cap Stocks | {mid_cap} |
-| Small-cap Stocks | {portfolio_size - large_cap - mid_cap} |
-| Total Budget | ${total_budget:,} |
-| Budget per Stock | 5% - 20% |
-
-### Objective Function Weights
-
-| Weight | Value |
-|--------|-------|
-| Fitness Score | 0.50 |
-| Percent Change from Intrinsic | 0.20 |
-| Revenue Growth | 0.25 |
-| Budget Utilization | 0.05 |
-
----
-
-## Results Summary
-
-### Performance Comparison
-
-| Algorithm | Objective Value | Budget Used | Budget % | Time (s) |
-|-----------|-----------------|-------------|----------|----------|
-"""
-    
-    for name, data in results.items():
-        if data['portfolio'] is not None:
-            budget_pct = (data['budget_used'] / total_budget) * 100
-            report += f"| **{name}** | {data['objective']:.4f} | ${data['budget_used']:,.0f} | {budget_pct:.1f}% | {data['time']:.2f} |\n"
-    
-    baseline_shlo = results.get('Baseline SHLO', {}).get('objective', 0)
-    gnn_shlo = results.get('GNN-SHLO', {}).get('objective', 0)
-    baseline_hc = results.get('Baseline HC', {}).get('objective', 0)
-    gnn_hc = results.get('GNN-HC', {}).get('objective', 0)
-    
-    shlo_improvement = ((gnn_shlo - baseline_shlo) / baseline_shlo * 100) if baseline_shlo > 0 else 0
-    hc_improvement = ((gnn_hc - baseline_hc) / baseline_hc * 100) if baseline_hc > 0 else 0
-    
-    report += f"""
-### Improvement
-
-| Comparison | Baseline | GNN-Enhanced | Improvement |
-|------------|----------|--------------|-------------|
-| SHLO | {baseline_shlo:.4f} | {gnn_shlo:.4f} | {shlo_improvement:+.2f}% |
-| Hill Climbing | {baseline_hc:.4f} | {gnn_hc:.4f} | {hc_improvement:+.2f}% |
-
----
-
-## Selected Portfolios
-
-"""
-    
-    for name, data in results.items():
-        if data['portfolio'] is not None:
-            report += f"### {name} Portfolio\n\n"
-            report += "| Stock ID | Symbol | Company | Price | Category | Quantity |\n"
-            report += "|----------|--------|---------|-------|----------|----------|\n"
-            
-            for stock in data['portfolio']:
-                cat_name = {1: 'Large', 2: 'Mid', 3: 'Small'}.get(stock[4], 'Unknown')
-                report += f"| {stock[0]} | {stock[1]} | {stock[2][:30]} | ${stock[3]} | {cat_name} | {stock[5]} |\n"
-            
-            report += f"\n**Total Budget Used**: ${data['budget_used']:,.0f} ({data['budget_used']/total_budget*100:.1f}%)\n"
-            report += f"**Objective Value**: {data['objective']:.4f}\n\n"
-    
-    report += """---
-
-## GNN Architecture
-
-### Graph Construction
-- **Nodes**: Each stock is a node with features:
-  - Normalized fitness score
-  - Normalized percent change from intrinsic value
-  - Normalized revenue growth
-  - Normalized stock price
-  - Category one-hot encoding (3 dimensions)
-
-- **Edges**: Stocks are connected if:
-  - Same market cap category, OR
-  - Cosine similarity > 0.3
-
-### Network Architecture
-```
-Input Features (8 dims) 
-    → GNN Layer 1 (16 hidden units, ReLU)
-    → GNN Layer 2 (8 output units)
-    → Enhanced Embeddings
-```
-
-### Message Passing
-Each layer performs:
-1. **Aggregation**: Collect features from neighboring nodes
-2. **Transformation**: Linear projection with learnable weights
-3. **Activation**: ReLU (except final layer)
-
-### Feature Enhancement
-Enhanced scores = 0.8 × Original scores + 0.2 × GNN embeddings
-
----
-
-## Conclusions
-
-"""
-    
-    if shlo_improvement > 0 and hc_improvement > 0:
-        report += f"""### Key Findings
-
-1. **GNN Enhancement Improves Both Algorithms**
-   - SHLO improved by {shlo_improvement:.2f}%
-   - Hill Climbing improved by {hc_improvement:.2f}%
-
-2. **Graph-based Feature Learning is Beneficial**
-   - Capturing stock relationships helps identify better portfolio combinations
-   - Stocks that are similar to high-performing stocks get boosted scores
-
-3. **Minimal Overhead**
-   - GNN adds negligible computational cost
-   - Simple 2-layer architecture is sufficient for improvement
-
-### Future Work
-
-1. **Dynamic Graphs**: Update edges based on temporal correlations
-2. **Attention Mechanisms**: Learn edge importance dynamically
-3. **Deeper Networks**: Explore more layers for complex relationships
-4. **Sector Information**: Include industry/sector as additional graph structure
-"""
-    else:
-        report += """### Key Findings
-
-The GNN enhancement shows mixed results in this experiment. This could be due to:
-1. Random initialization affecting results
-2. Need for hyperparameter tuning
-3. Dataset characteristics
-
-### Recommendations
-
-1. Run multiple experiments with different seeds
-2. Tune GNN architecture (layers, dimensions)
-3. Experiment with different edge construction methods
-"""
-    
-    report += """
----
-
-## Technical Notes
-
-- **Random Seed**: 42 (for reproducibility)
-- **GNN Implementation**: Pure NumPy (no deep learning framework required)
-- **Adjacency Matrix**: Symmetric normalized Laplacian
-- **Activation**: ReLU for hidden layers, linear for output
-
----
-
-*Generated by GNN-Enhanced Portfolio Optimization System*
-"""
     
     with open('GNN_EXPERIMENT_RESULTS.md', 'w') as f:
         f.write(report)
