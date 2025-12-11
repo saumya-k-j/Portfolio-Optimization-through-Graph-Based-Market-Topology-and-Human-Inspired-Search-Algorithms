@@ -1,21 +1,4 @@
 #!/usr/bin/env python3
-"""
-GNN-Enhanced Stock Portfolio Optimization
-
-This module implements a simple Graph Neural Network (GNN) to enhance stock feature
-representations before applying SHLO and Hill Climbing optimization algorithms.
-
-The GNN models relationships between stocks based on:
-1. Category similarity (same market cap category)
-2. Sector/Industry proximity (similar normalized features)
-3. Performance correlation (similar fitness scores)
-
-Innovation: Using GNN to learn enhanced stock embeddings that capture inter-stock
-relationships, which are then used to improve the objective function in portfolio optimization.
-
-Author: Research Implementation
-Date: 2024
-"""
 
 import numpy as np
 import pandas as pd
@@ -36,14 +19,7 @@ random.seed(RANDOM_SEED)
 class SimpleGNN:
     """
     A minimal Graph Neural Network implementation for stock relationship modeling.
-    
-    This GNN:
-    1. Builds a graph where nodes are stocks and edges connect similar stocks
-    2. Uses message passing to aggregate neighbor information
-    3. Produces enhanced feature representations for each stock
-    
-    The enhanced features capture not just individual stock metrics but also
-    the stock's relationship to other stocks in the universe.
+
     """
     
     def __init__(self, input_dim, hidden_dim=16, output_dim=8, num_layers=2):
@@ -123,7 +99,7 @@ class SimpleGNN:
         """
         Forward pass through the GNN.
         
-        Args:
+        Argument:
             features: Input feature matrix (num_stocks x input_dim)
             adj: Normalized adjacency matrix (num_stocks x num_stocks)
             
@@ -173,13 +149,6 @@ def prepare_gnn_features(stocks_df):
     """
     Prepare feature matrix for GNN from stock dataframe.
     
-    Args:
-        stocks_df: DataFrame with stock data
-        
-    Returns:
-        features: Feature matrix (num_stocks x num_features)
-        categories: Category array
-        original_scores: Original normalized scores
     """
     feature_cols = [
         'normalized_fitness_score',
@@ -247,24 +216,6 @@ def run_gnn_enhanced_shlo(stocks_df, portfolio_size, large_cap_count, mid_cap_co
     """
     Run SHLO algorithm with GNN-enhanced stock features.
     
-    Args:
-        stocks_df: DataFrame with stock data
-        portfolio_size: Number of stocks in portfolio
-        large_cap_count: Number of large-cap stocks
-        mid_cap_count: Number of mid-cap stocks
-        total_budget: Total investment budget
-        upper_budget_limit: Max percentage per stock
-        lower_budget_limit: Min percentage per stock
-        weight_*: Objective function weights
-        epochs: Number of optimization epochs
-        pop_size: Population size
-        
-    Returns:
-        best_portfolio: List of selected stocks
-        best_fitness: Best objective function value
-        total_budget_used: Total budget utilized
-        time_taken: Execution time
-        gnn_embeddings: GNN output embeddings
     """
     print("\n" + "="*60)
     print("GNN-ENHANCED SHLO ALGORITHM")
@@ -1054,7 +1005,7 @@ def main():
 
 
 def generate_results_report(results, portfolio_size, total_budget, large_cap, mid_cap):
-    """Generate markdown report with results comparison."""
+
     
     report = f"""# GNN-Enhanced Stock Portfolio Optimization Results
     
